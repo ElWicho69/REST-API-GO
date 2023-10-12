@@ -1,0 +1,26 @@
+version: '3.8'  # Versión de Docker Compose que se utilizará.
+
+services:  # Define los servicios de la aplicación.
+  web:  
+    build: .  # Construye la imagen del contenedor a partir del Dockerfile en el directorio actual.
+    env_file:
+      - .env  # Carga variables de entorno desde el archivo .env.
+    ports:
+      - 8000:8000 
+    volumes:
+      - .:/usr/src/app  # Monta el código fuente desde el directorio actual en /usr/src/app del contenedor.
+    command: air ./cmd/main.go -b 0.0.0.0  # Comando a ejecutar dentro del contenedor para la recarga en caliente.
+
+  db:  # Servicio para la base de datos PostgreSQL.
+    image: postgres:alpine  # Utiliza la imagen oficial de PostgreSQL en su versión alpina.
+    environment:
+      - POSTGRES_USER=${DB_USER}  
+      - POSTGRES_PASSWORD=${DB_PASSWORD}  
+      - POSTGRES_DB=${DB_NAME} 
+    ports:
+      - "5432:5432"  # Mapea el puerto 5432 del sistema anfitrión al puerto 5432 del contenedor.
+    volumes:
+      - postgres-db:/var/lib/postgresql/data  # Utiliza un volumen llamado postgres-db para almacenar los datos de PostgreSQL.
+
+volumes:  # Define los volúmenes utilizados por los servicios.
+  postgres-db:  # Volumen llamado postgres-db utilizado para persistir los datos de PostgreSQL.
